@@ -1,7 +1,7 @@
 <template>
     <div class="dish">
         <h1>Productos</h1>
-        <div v-for="dish in products" :key="dish.id" class="product">
+        <div v-for="dish in dishes" :key="dish.id" class="product">
             <div class="product-img">
                 <img v-bind:src="dish.img" alt="" />
             </div>
@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import { Dishes } from '../api/data.js'
+
 export default {
     name: 'dish',
     props: {
@@ -37,7 +39,22 @@ export default {
                     ingredients: 'lo que más guste',
                 },
             ],
+            dishes: [],
         }
+    },
+    mounted() {
+        this.GetAllDishes()
+    },
+    methods: {
+        GetAllDishes() {
+            const dishes = new Dishes()
+            const response = dishes.GetDishes()
+            response.then(data => this.PrintDishes(data))
+        },
+        PrintDishes(dishes) {
+            this.dishes = dishes.data
+            console.log(dishes.data)
+        },
     },
 }
 </script>
