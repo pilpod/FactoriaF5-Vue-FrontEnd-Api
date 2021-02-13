@@ -1,5 +1,8 @@
+/* eslint-disable */
+
 <template>
     <div class="dish">
+        <dish-create @newDish="AddDish"></dish-create>
         <h1>Productos</h1>
         <div v-for="dish in dishes" :key="dish.id" class="product">
             <div class="product-img">
@@ -8,20 +11,26 @@
             <div>
                 <h1>{{ dish.name }}</h1>
                 <span>{{ dish.ingredients }}</span>
+                <button v-on:click="DeleteDish(dish.id)">Delete</button>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import { Dishes } from '../api/data.js'
+import { ApiService } from '../api/data.js'
+import DishCreate from './DishCreate.vue'
 
 export default {
     name: 'dish',
+    components: {
+        DishCreate,
+    },
     props: {
         img: String,
         name: String,
         ingrededients: String,
+        id: Number,
     },
     data() {
         return {
@@ -40,6 +49,7 @@ export default {
                 },
             ],
             dishes: [],
+            newDish: Object,
         }
     },
     mounted() {
@@ -47,13 +57,26 @@ export default {
     },
     methods: {
         GetAllDishes() {
-            const dishes = new Dishes()
-            const response = dishes.GetDishes()
+            const apiRepo = new ApiService()
+            const response = apiRepo.GetDishes()
             response.then(data => this.PrintDishes(data))
         },
         PrintDishes(dishes) {
             this.dishes = dishes.data
-            console.log(dishes.data)
+        },
+        DeleteDish(id) {
+            const apiRepo = new ApiService()
+            apiRepo.DeleteDish(id)
+            let index
+            this.dishes.forEach(dish => {
+                if (dish.id == id) {
+                    index = this.dishes.indexOf(dish)
+                }
+            })
+            this.dishes.splice(index, 1)
+        },
+        AddDish(data) {
+            this.dishes.push(data)
         },
     },
 }
